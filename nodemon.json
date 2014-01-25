@@ -1,0 +1,9 @@
+{
+	"execMap": {
+		"js": "node --harmony"
+	},
+	"env": {
+		"DEBUG": "koa-send"
+	},
+	"ext":"js,html"
+}
