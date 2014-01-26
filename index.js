@@ -30,24 +30,37 @@ app.resource('posts', {
 	index: function *(next) {
 		var posts = yield db.list();
 		this.body = yield render('list', {posts: posts });
-		yield next;
 	},
 	// GET /posts/new
 	new: function *(next) {
+		console.log('NEW');
+		this.body = yield render('new');
+		console.log('NEW DONE');
 	},
 	// POST /posts
 	create: function *(next) {
+		yield next;
+		var submitted = yield parse(this);
+		yield db.insert(submitted.title, submitted.body);
+		this.redirect('/posts');
 	},
-	// GET /posts/:id
+	// GET /posts/:post
 	show: function *(next) {
+		if (this.status) return; // already handled
+		console.log('SHOW');
+		var guid = this.params.post;
+		var post = yield db.find(guid);
+		if (!post) this.throw(404, 'invalid post id');
+		this.body = yield render('show', { post: post });
+		console.log('SHOW DONE');
 	},
-	// GET /posts/:id/edit
+	// GET /posts/:post/edit
 	edit: function *(next) {
 	},
-	// PUT /posts/:id
+	// PUT /posts/:post
 	update: function *(next) {
 	},
-	// DELETE /posts/:id
+	// DELETE /posts/:post
 	destroy: function *(next) {
 		var guid = this.params.post;
 		yield db.remove(guid);

@@ -55,6 +55,21 @@
 	<script src="/superagent.js"></script>
 
 
+	<script>
+
+		function deletePost(button) {
+			var guid = button.getAttribute('data-guid');
+
+			superagent.del('/posts/' + guid, function(res) {
+				console.log('done', res);
+				location.href = '/posts';
+			});
+
+		}
+
+	</script>
+
+
 </head>
 <body>
 	<nav>

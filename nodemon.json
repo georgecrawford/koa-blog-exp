@@ -3,7 +3,7 @@
 		"js": "node --harmony"
 	},
 	"env": {
-		"DEBUG": "koa-send"
+		"DEBUG": "koa*"
 	},
-	"ext":"js,html"
+	"ext":"js,html,json"
 }

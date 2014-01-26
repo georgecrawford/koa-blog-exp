@@ -6,31 +6,17 @@
   <h1>Posts</h1>
   {% if deleted %}<p>Your post was deleted</p>{% endif %}
   <p>You have <strong>{{ posts.length }}</strong> posts!</p>
-  <p><a href="/post/new">Create a Post</a></p>
+  <p><a href="/posts/new">Create a Post</a></p>
   <ul id="posts">
     {% for post in posts %}
       <li id="post-{{ post.guid }}">
         <h2>{{ post.title }}</h2>
         <h3>{{ post.date|date('Y-m-d H:m:s') }}</h3>
-        <p><a href="/post/{{ post.guid }}">Read post</a></p>
+        <p><a href="/posts/{{ post.guid }}">Read post</a></p>
         <button data-guid="{{post.guid}}" onclick="deletePost(this)">Delete</button>
       </li>
     {% endfor %}
   </ul>
 
-
-<script>
-
-	function deletePost(button) {
-		var guid = button.getAttribute('data-guid');
-
-		superagent.del('/posts/' + guid, function(res) {
-			console.log('done', res);
-			location.href = '/posts';
-		});
-
-	}
-
-</script>
 
 {% endblock %}

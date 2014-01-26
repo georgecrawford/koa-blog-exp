@@ -1,0 +1,10 @@
+{% extends 'layout.html' %}
+
+{% block title %}{{ post.title }}{% endblock %}
+
+{% block content %}
+	<h1>{{ post.title }}</h1>
+	<h3>{{ post.date|date('Y-m-d H:m:s') }}</h3>
+	<p>{{ post.body }}</p>
+	<button data-guid="{{post.guid}}" onclick="deletePost(this)">Delete</button>
+{% endblock %}
