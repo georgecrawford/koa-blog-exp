@@ -1,0 +1,18 @@
+{% extends 'layout.html' %}
+
+{% block title %}Error - {{status}}{% endblock %}
+
+{% block content %}
+    <div id="error">
+      <h1>Error - {{status}}</h1>
+    <p>Looks like something broke!</p>
+    {% if env == 'development' %}
+      <pre>
+<strong>{{error}}</strong>
+        <code>
+{{stack}}
+        </code>
+      </pre>
+    {% endif %}
+    </div>
+{% endblock %}

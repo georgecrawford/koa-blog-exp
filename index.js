@@ -1,20 +1,34 @@
-var koa    = require('koa'),
-    logger = require('koa-logger'),
-    router = require('koa-router'),
-    serve  = require('koa-static'),
+var koa         = require('koa'),
+    logger      = require('koa-logger'),
+    path        = require('path'),
+    router      = require('koa-router'),
+    staticCache = require('koa-static-cache'),
+    error       = require('koa-error'),
 
-    views  = require('co-views'),
-    parse  = require('co-body'),
+    views       = require('co-views'),
+    parse       = require('co-body'),
 
-    db     = require('./lib/db'),
-    render = require('./lib/render');
+    db          = require('./lib/db'),
+    render      = require('./lib/render');
 
-    app    = koa();
+    app         = koa();
 
 // Wrap subsequent middleware in a logger
-app.use(logger());
+// app.use(logger());
 
-app.use(serve('html'));
+app.use(error({template: __dirname + '/views/error.html'}));
+
+app.use(staticCache(path.join(__dirname, 'public'), {
+	maxAge: 7 * 24 * 60 * 60,
+	buffer: true
+}))
+
+app.use(function *(next){
+	var start = new Date;
+	yield next;
+	var ms = new Date - start;
+	if (this.body) this.body = this.body + '<pre>Query took ' + ms + 'ms</pre>';
+});
 
 
 app.use(router(app));

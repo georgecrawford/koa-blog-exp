@@ -3,7 +3,7 @@
 		"js": "node --harmony"
 	},
 	"env": {
-		"DEBUG": "koa-routes"
+		"DEBUG": "asd"
 	},
 	"ext":"js,html,json"
 }
