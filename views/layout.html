@@ -64,7 +64,29 @@
 				console.log('done', res);
 				location.href = '/posts';
 			});
+		}
 
+		function editPost(button) {
+
+			var values = {}, elements;
+
+			if (!button || !button.form) return console.error('Could not find form');
+
+			elements = [].slice.call(button.form.elements);
+			elements.forEach(function(element) {
+				if (element.name && element.value) {
+					values[element.name] = element.value;
+				}
+			});
+
+			if (!values.guid) return console.error('GUID field not found');
+
+			superagent.put('/posts/' + values.guid)
+				.send(values)
+				.end(function(res) {
+					console.log('done', res);
+					location.href = '/posts/' + values.guid;
+			});
 		}
 
 	</script>

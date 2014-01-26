@@ -1,0 +1,14 @@
+{% extends 'layout.html' %}
+
+{% block title %}Edit Post{% endblock %}
+
+{% block content %}
+	<h1>Edit post</h1>
+	<form onsubmit="return false;">
+		<input type="hidden" name="guid" value="{{post.guid}}">
+		<p><input type="text" placeholder="Title" name="title" value="{{post.title}}"></p>
+		<p><textarea placeholder="Contents" name="body">{{post.body}}</textarea></p>
+		<a href="/posts/{{post.guid}}">Cancel</a>
+		<button onclick="editPost(this)">Submit</button>
+	</form>
+{% endblock %}

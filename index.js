@@ -33,32 +33,40 @@ app.resource('posts', {
 	},
 	// GET /posts/new
 	new: function *(next) {
-		console.log('NEW');
 		this.body = yield render('new');
-		console.log('NEW DONE');
 	},
 	// POST /posts
 	create: function *(next) {
-		yield next;
 		var submitted = yield parse(this);
 		yield db.insert(submitted.title, submitted.body);
 		this.redirect('/posts');
 	},
 	// GET /posts/:post
 	show: function *(next) {
-		if (this.status) return; // already handled
-		console.log('SHOW');
+		if (this.status) return; // already handled - ideally this line shouldn't be necessary
 		var guid = this.params.post;
 		var post = yield db.find(guid);
 		if (!post) this.throw(404, 'invalid post id');
 		this.body = yield render('show', { post: post });
-		console.log('SHOW DONE');
 	},
 	// GET /posts/:post/edit
 	edit: function *(next) {
+		var guid = this.params.post;
+		var post = yield db.find(guid);
+		if (!post) this.throw(404, 'invalid post id');
+		this.body = yield render('edit', { post: post });
 	},
 	// PUT /posts/:post
 	update: function *(next) {
+		var submitted = yield parse(this);
+		if (!submitted.guid) this.throw(404, 'invalid post id');
+		var post = yield db.find(submitted.guid);
+		if (!post) this.throw(404, 'invalid post id');
+		for (var i in submitted) {
+			post[i] = submitted[i];
+		}
+		yield db.update(post);
+		this.response.status = 200;
 	},
 	// DELETE /posts/:post
 	destroy: function *(next) {
@@ -67,16 +75,6 @@ app.resource('posts', {
 		this.response.status = 200;
 	}
 });
-
-// function write(ctx, text) {
-// 	ctx.body = (ctx.body && ctx.body + '\n' || '') + JSON.stringify(text);
-// }
-
-
-// app.use(function *(next){
-// 	yield db.insert('my title', 'my body');
-// 	yield next;
-// });
 
 
 // Serve the app

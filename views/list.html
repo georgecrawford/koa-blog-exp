@@ -12,8 +12,11 @@
       <li id="post-{{ post.guid }}">
         <h2>{{ post.title }}</h2>
         <h3>{{ post.date|date('Y-m-d H:m:s') }}</h3>
-        <p><a href="/posts/{{ post.guid }}">Read post</a></p>
-        <button data-guid="{{post.guid}}" onclick="deletePost(this)">Delete</button>
+        <p>
+			<a href="/posts/{{ post.guid }}">Read post</a>
+			<a href="/posts/{{post.guid}}/edit">Edit</a>
+	        <button data-guid="{{post.guid}}" onclick="deletePost(this)">Delete</button>
+        </p>
       </li>
     {% endfor %}
   </ul>
