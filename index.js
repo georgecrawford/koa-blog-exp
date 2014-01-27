@@ -57,7 +57,6 @@ app.resource('posts', {
 	},
 	// GET /posts/:post
 	show: function *(next) {
-		if (this.status) return; // already handled - ideally this line shouldn't be necessary
 		var guid = this.params.post;
 		var post = yield db.find(guid);
 		if (!post) this.throw(404, 'invalid post id');
