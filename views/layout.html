@@ -50,6 +50,11 @@
 		input[type=text] {
 			width: 500px;
 		}
+
+		#messages {
+			background: red;
+			padding: 10px;
+		}
 	</style>
 
 	<script src="/superagent.js"></script>
@@ -98,6 +103,17 @@
 		<a href="/">Home</a>
 		<a href="/posts">Posts</a>
 	</nav>
+	<header>
+		{% raw %}
+		{% if messages.length %}
+			<ul id='messages'>
+			{% for message in messages %}
+				<li>{{ message }}</li>
+			{% endfor %}
+			</ul>
+		{% endif %}
+		{% endraw %}
+	</header>
 	<section id="content">
 		{% block content %}
 			<p>Missing content!</p>

@@ -9,26 +9,39 @@ var koa         = require('koa'),
     parse       = require('co-body'),
 
     db          = require('./lib/db'),
-    render      = require('./lib/render');
+    render      = require('./lib/render'),
+    message     = require('./lib/message'),
 
     app         = koa();
 
+
 // Wrap subsequent middleware in a logger
-// app.use(logger());
+app.use(logger());
+
+// Wrap subsequent middleware in a logger
+app.use(message(app));
+
+// Page wrapper
+app.use(function *(next){
+	yield next;
+	if (this.body && 'text/html' === this.response.type && 200 === this.response.status) this.body = yield render.assemble(this.body, {messages: this.messages.get()});
+});
+
+// Timer
+app.use(function *(next){
+	var start = new Date;
+	yield next;
+	var ms = new Date - start;
+	if (this.body && 'text/html' === this.response.type) this.body = this.body + '<pre>Query took ' + ms + 'ms</pre>';
+});
+
 
 app.use(error({template: __dirname + '/views/error.html'}));
 
 app.use(staticCache(path.join(__dirname, 'public'), {
 	maxAge: 7 * 24 * 60 * 60,
 	buffer: true
-}))
-
-app.use(function *(next){
-	var start = new Date;
-	yield next;
-	var ms = new Date - start;
-	if (this.body) this.body = this.body + '<pre>Query took ' + ms + 'ms</pre>';
-});
+}));
 
 
 app.use(router(app));
@@ -54,6 +67,7 @@ app.resource('posts', {
 		var submitted = yield parse(this);
 		yield db.insert(submitted.title, submitted.body);
 		this.redirect('/posts');
+		this.messages.add('Your new post was created');
 	},
 	// GET /posts/:post
 	show: function *(next) {
@@ -79,12 +93,14 @@ app.resource('posts', {
 			post[i] = submitted[i];
 		}
 		yield db.update(post);
+		this.messages.add('Your post was updated');
 		this.response.status = 200;
 	},
 	// DELETE /posts/:post
 	destroy: function *(next) {
 		var guid = this.params.post;
 		yield db.remove(guid);
+		this.messages.add('Your post was deleted');
 		this.response.status = 200;
 	}
 });
