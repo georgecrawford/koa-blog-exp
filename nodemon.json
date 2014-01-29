@@ -3,7 +3,7 @@
 		"js": "node --harmony"
 	},
 	"env": {
-		"DEBUG": "gc-messages"
+		"DEBUG": "none"
 	},
 	"ext":"js,html,json"
 }

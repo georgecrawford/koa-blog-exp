@@ -113,6 +113,38 @@
 			</ul>
 		{% endif %}
 		{% endraw %}
+		<div id='search'>
+			<form>
+				<input id="search-input" type="text" placeholder="Search" name="query" autocomplete="off" />
+			</form>
+			<ul id="search-results"></ul>
+			<script>
+				var input   = document.getElementById('search-input'),
+					results = document.getElementById('search-results');
+
+				input.addEventListener('keyup', function() {
+					var val = this.value.trim();
+
+					results.innerHTML = '';
+					if (!val) return;
+
+					superagent.get('/posts/search/' + val)
+						.end(function(res) {
+							if (!res.ok || !res.text) return;
+							try {
+								posts = JSON.parse(res.text);
+							} catch (e) {}
+
+							if (posts && posts.length) {
+								posts.forEach(function(post) {
+									results.innerHTML += '<li><a href="/posts/' + post.guid + '">' + post.title + '</a></li>';
+								});
+							}
+						});
+
+				});
+			</script>
+		</div>
 	</header>
 	<section id="content">
 		{% block content %}

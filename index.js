@@ -8,6 +8,11 @@ var koa         = require('koa'),
     views       = require('co-views'),
     parse       = require('co-body'),
 
+    reds        = require('reds'),
+    search      = reds.createSearch('blogposts'),
+    each        = require('co-each'),
+    querystring = require('querystring'),
+
     db          = require('./lib/db'),
     render      = require('./lib/render'),
     message     = require('./lib/message'),
@@ -65,9 +70,10 @@ app.resource('posts', {
 	// POST /posts
 	create: function *(next) {
 		var submitted = yield parse(this);
-		yield db.insert(submitted.title, submitted.body);
+		var inserted = yield db.insert(submitted.title, submitted.body);
 		this.redirect('/posts');
 		this.messages.add('Your new post was created');
+		search.index([submitted.title, submitted.body].join(' '), inserted.guid);
 	},
 	// GET /posts/:post
 	show: function *(next) {
@@ -95,6 +101,9 @@ app.resource('posts', {
 		yield db.update(post);
 		this.messages.add('Your post was updated');
 		this.response.status = 200;
+
+		search.remove(guid);
+		search.index([submitted.title, submitted.body].join(' '), submitted.guid);
 	},
 	// DELETE /posts/:post
 	destroy: function *(next) {
@@ -102,7 +111,25 @@ app.resource('posts', {
 		yield db.remove(guid);
 		this.messages.add('Your post was deleted');
 		this.response.status = 200;
+		search.remove(guid);
 	}
+});
+
+function searchQuery(query) {
+	return function(cb) {
+		search.query(query)
+			.end(cb, 'or');
+	}
+}
+
+app.get('/posts/search/:query', function *(next) {
+	var ids = yield searchQuery(querystring.unescape(this.params.query));
+	var matches = yield each(ids, function(guid) {
+		return db.find(guid);
+	})
+
+	this.type = 'json';
+	this.body = JSON.stringify(matches);
 });
 
 

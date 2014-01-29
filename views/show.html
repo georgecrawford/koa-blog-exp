@@ -3,6 +3,7 @@
 {% block title %}{{ post.title }}{% endblock %}
 
 {% block content %}
+	<p><a href="/posts/new">Create a Post</a></p>
 	<h1>{{ post.title }}</h1>
 	<h3>{{ post.date|date('Y-m-d H:m:s') }}</h3>
 	<p>{{ post.body }}</p>
